@@ -35,13 +35,15 @@ If you want to run or test this project locally on your machine, follow these st
    cd Web-Demon
    
 2. **Install dependencies**
-   ```pip install -r requirements.txt
+   ```bash
+   pip install -r requirements.txt
    
 3. **Run the application**
-   ```python app.py
+   ```bash
+   python app.py
 
 4. **Open in browser**
-   Navigate to `https://127.0.0.1:5000 or https://localhost:5000
+   Navigate to https://127.0.0.1:5000 or https://localhost:5000
 
 ## 📝 How It Works
 1. User enters the account details or tokens on the web interface.
