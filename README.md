@@ -54,4 +54,5 @@ If you want to run or test this project locally on your machine, follow these st
 • Developed & Maintained by: Demon (Discord: @n8x3)
 
 ## ©️ Copyright Notice
-©2026 Demon. All rights reserved. Unauthorized distribution, modification, or copying of this repository's source code is strictly prohibited.
+©2026 Demon. All rights reserved. Unauthorized distribution, modification, or copying of this repository's source code is strictly prohibited. 
+Take permission before using code.
