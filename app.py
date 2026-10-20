@@ -44,7 +44,7 @@ def process_text_file(job_id, input_file):
         
         # Placeholder fallback if checker.py uses standard file paths:
         # (Replace this line with your actual checker function call)
-        checker.run(str(input_file), str(output_file)) 
+        validator.run(str(input_file), str(output_file)) 
         # ------------------------------
 
         # Read results to count lines or give stats back to website
