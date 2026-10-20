@@ -1,0 +1,446 @@
+<!DOCTYPE html>  <html lang="en">  
+<head>  
+<meta charset="UTF-8">  
+<meta name="viewport" content="width=device-width, initial-scale=1">  
+<title>Demon | Dashboard</title>  <style>  
+:root {  
+    --bg: #09090f;  
+    --panel: #12121c;  
+    --border: #29283a;  
+    --purple: #a855f7;  
+    --text: #f4f0ff;  
+    --muted: #9290a6;  
+    --green: #4ade80;  
+}  
+  
+* { box-sizing: border-box; }  
+  
+body {  
+    margin: 0;  
+    min-height: 100vh;  
+    padding: 40px 18px;  
+    color: var(--text);  
+    background:  
+        radial-gradient(ellipse at 50% 0%, #28123f 0%, transparent 50%),  
+        var(--bg);  
+    font-family: Inter, "Segoe UI", Arial, sans-serif;  
+}  
+  
+.container {  
+    width: 100%;  
+    max-width: 720px;  
+    margin: auto;  
+    animation: appear .7s ease both;  
+}  
+  
+@keyframes appear {  
+    from { opacity: 0; transform: translateY(15px); }  
+    to { opacity: 1; transform: translateY(0); }  
+}  
+  
+header {  
+    display: flex;  
+    align-items: center;  
+    gap: 13px;  
+    margin-bottom: 32px;  
+}  
+  
+.logo {  
+    width: 48px;  
+    height: 48px;  
+    display: grid;  
+    place-items: center;  
+    border-radius: 15px;  
+    background: linear-gradient(135deg, #c084fc, #7c3aed);  
+    color: white;  
+    font-weight: 900;  
+    font-size: 24px;  
+    box-shadow: 0 0 30px #9333ea45;  
+}  
+  
+h1 { font-size: 25px; margin: 0; letter-spacing: -.7px; }  
+.subtitle { color: var(--muted); font-size: 13px; margin-top: 5px; }  
+  
+.card {  
+    padding: 26px;  
+    border: 1px solid var(--border);  
+    border-radius: 20px;  
+    background: linear-gradient(145deg, #171622, #101019);  
+    box-shadow: 0 20px 60px #00000035;  
+    margin-bottom: 18px;  
+}  
+  
+.card-title {  
+    font-size: 16px;  
+    font-weight: 700;  
+    margin: 0 0 7px;  
+}  
+  
+.description {  
+    color: var(--muted);  
+    font-size: 13px;  
+    line-height: 1.6;  
+    margin: 0 0 22px;  
+}  
+  
+.dropzone {  
+    border: 1px dashed #51406d;  
+    border-radius: 14px;  
+    padding: 24px 16px;  
+    text-align: center;  
+    background: #a855f708;  
+    transition: border-color .2s, background .2s;  
+}  
+  
+.dropzone:focus-within,  
+.dropzone:hover {  
+    border-color: var(--purple);  
+    background: #a855f712;  
+}  
+  
+.file-icon {  
+    font-size: 28px;  
+    margin-bottom: 10px;  
+}  
+  
+input[type=file] {  
+    display: block;  
+    width: 100%;  
+    max-width: 100%;  
+    margin-top: 15px;  
+    color: var(--muted);  
+    font-size: 12px;  
+}  
+  
+input[type=file]::file-selector-button {  
+    padding: 9px 12px;  
+    border: 1px solid #51406d;  
+    border-radius: 8px;  
+    background: #252035;  
+    color: white;  
+    cursor: pointer;  
+    margin-right: 10px;  
+}  
+  
+button {  
+    width: 100%;  
+    padding: 13px 16px;  
+    margin-top: 16px;  
+    border: 1px solid transparent;  
+    border-radius: 10px;  
+    font-size: 14px;  
+    font-weight: 700;  
+    cursor: pointer;  
+    transition: transform .2s, opacity .2s, box-shadow .2s;  
+}  
+  
+button:hover:not(:disabled) {  
+    transform: translateY(-2px);  
+    box-shadow: 0 8px 24px #9333ea25;  
+}  
+  
+button:disabled { opacity: .45; cursor: not-allowed; }  
+  
+.primary {  
+    color: white;  
+    background: linear-gradient(100deg, #9333ea, #7c3aed);  
+}  
+  
+.secondary {  
+    color: #e9d5ff;  
+    border-color: var(--border);  
+    background: #201c2e;  
+}  
+  
+.status-row {  
+    display: flex;  
+    align-items: center;  
+    justify-content: space-between;  
+    gap: 12px;  
+    margin: 18px 0 12px;  
+}  
+  
+.status-label { color: var(--muted); font-size: 13px; }  
+  
+.badge {  
+    padding: 6px 10px;  
+    border: 1px solid #454055;  
+    border-radius: 30px;  
+    color: #c4b5fd;  
+    background: #a855f710;  
+    font-size: 11px;  
+    font-weight: 700;  
+}  
+  
+.badge.running {  
+    color: #fcd34d;  
+    border-color: #854d0e;  
+    background: #854d0e22;  
+}  
+  
+.badge.complete {  
+    color: var(--green);  
+    border-color: #166534;  
+    background: #16653422;  
+}  
+  
+.progress-track {  
+    height: 7px;  
+    overflow: hidden;  
+    border-radius: 10px;  
+    background: #292638;  
+}  
+  
+.progress-fill {  
+    height: 100%;  
+    width: 0%;  
+    border-radius: inherit;  
+    background: linear-gradient(90deg, #7c3aed, #d8b4fe);  
+    transition: width .5s ease;  
+}  
+  
+.progress-fill.active {  
+    background: linear-gradient(90deg, #7c3aed, #d8b4fe, #7c3aed);  
+    background-size: 200% 100%;  
+    animation: shimmer 1.5s linear infinite;  
+}  
+  
+@keyframes shimmer {  
+    from { background-position: 100% 0; }  
+    to { background-position: -100% 0; }  
+}  
+  
+#message {  
+    color: var(--muted);  
+    font-size: 13px;  
+    line-height: 1.6;  
+    overflow-wrap: anywhere;  
+    margin-top: 14px;  
+}  
+  
+.stats {  
+    display: grid;  
+    grid-template-columns: 1fr 1fr;  
+    gap: 12px;  
+    margin-top: 20px;  
+}  
+  
+.stat {  
+    padding: 16px;  
+    border: 1px solid var(--border);  
+    border-radius: 12px;  
+    background: #ffffff03;  
+}  
+  
+.stat-name { color: var(--muted); font-size: 12px; }  
+.stat-value { font-size: 22px; font-weight: 800; margin-top: 8px; }  
+  
+footer {  
+    text-align: center;  
+    color: #666477;  
+    font-size: 12px;  
+    padding: 18px 0;  
+}  
+  
+@media (max-width: 480px) {  
+    body { padding: 25px 13px; }  
+    .card { padding: 19px; }  
+    h1 { font-size: 22px; }  
+}  
+</style>  </head>  <body>  
+<div class="container">  
+    <header>  
+        <div class="logo">D</div>  
+        <div>  
+            <h1>Demon Dashboard</h1>  
+            <div class="subtitle">Minecraft account checker</div>  
+        </div>  
+    </header>  <section class="card">  
+    <h2 class="card-title">Upload your file</h2>  
+    <p class="description">  
+        Choose a text file to create a processing job.  
+    </p>  
+
+    <form id="uploadForm">  
+    <div class="dropzone">  
+        <div class="file-icon">📄</div>  
+        <strong>Select a TXT file</strong>  
+        <!-- Yahan accept attribute hata diya hai taaki mobile me koi restriction na aaye -->
+        <input type="file" name="file" id="fileInput" required>  
+    </div>  
+    <button class="primary" id="uploadBtn" type="submit">  
+        Upload File  
+    </button>  
+</form>  
+
+
+    <button class="secondary" id="startBtn" disabled>  
+        ▶ &nbsp; Start Processing  
+    </button>  
+</section>  
+
+<section class="card">  
+    <h2 class="card-title">Job status</h2>  
+    <p class="description">Track the current demo job below.</p>  
+
+    <div class="status-row">  
+        <span class="status-label">Current status</span>  
+        <span class="badge" id="badge">READY</span>  
+    </div>  
+
+    <div class="progress-track">  
+        <div class="progress-fill" id="progress"></div>  
+    </div>  
+
+    <div id="message" role="status" aria-live="polite">  
+        Upload a file to get started.  
+    </div>  
+
+    <div class="stats">  
+        <div class="stat">  
+            <div class="stat-name">Lines processed</div>  
+            <div class="stat-value" id="lineCount">—</div>  
+        </div>  
+        <div class="stat">  
+            <div class="stat-name">Progress</div>  
+            <div class="stat-value" id="percent">0%</div>  
+        </div>  
+    </div>  
+</section>  
+
+<footer>Demon Dashboard · Local demo mode</footer>
+
+</div>  <script>  
+console.log("Demon Dashboard JS loaded");  
+  
+const form = document.getElementById("uploadForm");  
+  
+form.addEventListener("submit", (event) => {  
+    event.preventDefault();  
+    console.log("Upload form intercepted");  
+});  
+const uploadBtn = document.getElementById("uploadBtn");  
+const startBtn = document.getElementById("startBtn");  
+const badge = document.getElementById("badge");  
+const progress = document.getElementById("progress");  
+const message = document.getElementById("message");  
+const lineCount = document.getElementById("lineCount");  
+const percent = document.getElementById("percent");  
+  
+let jobId = null;  
+let busy = false;  
+  
+function setStatus(name, value, text) {  
+    badge.textContent = name.toUpperCase();  
+    badge.className = "badge";  
+  
+    if (name === "Running") badge.classList.add("running");  
+    if (name === "Completed") badge.classList.add("complete");  
+  
+    progress.style.width = value + "%";  
+    progress.classList.toggle("active", name === "Running");  
+    percent.textContent = value + "%";  
+    message.textContent = text;  
+}  
+  
+form.addEventListener("submit", async (event) => {  
+    event.preventDefault();  
+  
+    if (busy) return;  
+  
+    busy = true;  
+    uploadBtn.disabled = true;  
+    startBtn.disabled = true;  
+    setStatus("Queued", 10, "Uploading your file...");  
+  
+    try {  
+        const response = await fetch("/upload", {  
+            method: "POST",  
+            body: new FormData(form)  
+        });  
+  
+        const data = await response.json();  
+  
+        if (!response.ok) {  
+            throw new Error(data.error || "Upload failed");  
+        }  
+  
+        jobId = data.job_id;  
+        setStatus("Ready", 0, data.message + " · Job ID: " + jobId);  
+        startBtn.disabled = false;  
+    } catch (error) {  
+        setStatus("Error", 0, error.message);  
+    } finally {  
+        busy = false;  
+        uploadBtn.disabled = false;  
+    }  
+});  
+  
+  
+  
+startBtn.addEventListener("click", async () => {  
+    if (!jobId || busy) return;  
+  
+    busy = true;  
+    startBtn.disabled = true;  
+    setStatus("Queued", 10, "Starting file processing...");  
+    lineCount.textContent = "—";  
+  
+    try {  
+        const response = await fetch(  
+            "/start/" + encodeURIComponent(jobId),  
+            { method: "POST" }  
+        );  
+        const data = await response.json();  
+  
+        if (!response.ok) {  
+            throw new Error(data.error || "Could not start job");  
+        }  
+  
+        while (true) {  
+            const res = await fetch(  
+                "/status/" + encodeURIComponent(jobId),  
+                { cache: "no-store" }  
+            );  
+            const status = await res.json();  
+  
+            if (!res.ok) {  
+                throw new Error(status.error || "Status check failed");  
+            }  
+  
+            if (status.status === "Completed") {  
+    setStatus("Completed", 100, status.message);  
+    lineCount.textContent = status.line_count ?? "—";  
+
+    // Automatically add a download link for results.txt
+    if (status.download_url) {
+        message.innerHTML += `<br><br><a href="${status.download_url}" class="primary" style="display:inline-block; padding:10px 16px; text-decoration:none; border-radius:8px; background:#4ade80; color:#000; font-weight:bold;">📥 Download results.txt</a>`;
+    }
+    break;  
+}  
+
+  
+            if (status.status === "Error") {  
+                throw new Error(status.message || "Processing failed");  
+            }  
+  
+            setStatus(  
+                status.status || "Running",  
+                50,  
+                status.message || "Processing..."  
+            );  
+  
+            await new Promise(resolve => setTimeout(resolve, 1000));  
+        }  
+    } catch (error) {  
+        setStatus("Error", 0, error.message);  
+    } finally {  
+        busy = false;  
+        startBtn.disabled = false;  
+    }  
+});  
+  
+  
+;  
+</script>  </body>  
+</html> 
