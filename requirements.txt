@@ -3,3 +3,4 @@ requests
 colorama
 urllib3
 gunicorn
+PySocks
