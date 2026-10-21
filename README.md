@@ -6,7 +6,7 @@ A lightweight, secure, and fast web application built with **Flask** to validate
 
 ## 🚀 Checker Website
 You can access the website here:
-🔗 **[Bitly Link](https://bit.ly/4shHOUv)**
+🔗 **[checker website](https://bit.ly/4shHOUv)**
 
 ---
 
