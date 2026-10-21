@@ -1,8 +1,10 @@
-<!DOCTYPE html>  <html lang="en">  
+<!DOCTYPE html>  
+<html lang="en">  
 <head>  
 <meta charset="UTF-8">  
 <meta name="viewport" content="width=device-width, initial-scale=1">  
-<title>Demon | Dashboard</title>  <style>  
+<title>Demon | Checker</title>  
+<style>  
 :root {  
     --bg: #09090f;  
     --panel: #12121c;  
@@ -48,15 +50,19 @@ header {
 .logo {  
     width: 48px;  
     height: 48px;  
-    display: grid;  
-    place-items: center;  
-    border-radius: 15px;  
-    background: linear-gradient(135deg, #c084fc, #7c3aed);  
-    color: white;  
-    font-weight: 900;  
-    font-size: 24px;  
-    box-shadow: 0 0 30px #9333ea45;  
+    border-radius: 14px;  
+    overflow: hidden;  
+    box-shadow: 0 0 20px #9333ea35;  
+    flex-shrink: 0;
 }  
+
+.logo img {  
+    width: 100%;  
+    height: 100%;  
+    object-fit: cover;  
+    display: block;
+}
+
   
 h1 { font-size: 25px; margin: 0; letter-spacing: -.7px; }  
 .subtitle { color: var(--muted); font-size: 13px; margin-top: 5px; }  
@@ -90,6 +96,7 @@ h1 { font-size: 25px; margin: 0; letter-spacing: -.7px; }
     text-align: center;  
     background: #a855f708;  
     transition: border-color .2s, background .2s;  
+    margin-bottom: 15px;  
 }  
   
 .dropzone:focus-within,  
@@ -120,6 +127,46 @@ input[type=file]::file-selector-button {
     color: white;  
     cursor: pointer;  
     margin-right: 10px;  
+}  
+  
+.webhook-section {  
+    margin: 18px 0;  
+    padding: 14px;  
+    border: 1px solid var(--border);  
+    border-radius: 12px;  
+    background: #181722;  
+}  
+  
+.webhook-section label {  
+    display: flex;  
+    align-items: center;  
+    gap: 10px;  
+    font-size: 13px;  
+    color: var(--text);  
+    cursor: pointer;  
+}  
+  
+.webhook-section input[type="checkbox"] {  
+    width: 16px;  
+    height: 16px;  
+    accent-color: var(--purple);  
+    cursor: pointer;  
+}  
+  
+.webhook-input {  
+    width: 100%;  
+    padding: 10px 12px;  
+    margin-top: 12px;  
+    border: 1px solid var(--border);  
+    border-radius: 8px;  
+    background: #0d0c14;  
+    color: white;  
+    font-size: 13px;  
+    outline: none;  
+}  
+  
+.webhook-input:focus {  
+    border-color: var(--purple);  
 }  
   
 button {  
@@ -247,78 +294,106 @@ footer {
     .card { padding: 19px; }  
     h1 { font-size: 22px; }  
 }  
-</style>  </head>  <body>  
+</style>  
+</head>  
+<body>  
 <div class="container">  
     <header>  
-        <div class="logo">D</div>  
-        <div>  
+      <div class="logo">
+    <img src="https://raw.githubusercontent.com/Ashgamer33484/Web-Demon/refs/heads/main/static/logo.png" alt="Demon Logo">
+      </div>  
+        <div> 
             <h1>Demon Dashboard</h1>  
             <div class="subtitle">Minecraft account checker</div>  
         </div>  
-    </header>  <section class="card">  
-    <h2 class="card-title">Upload your file</h2>  
-    <p class="description">  
-        Choose a text file to create a processing job.  
-    </p>  
+    </header>  
 
-    <form id="uploadForm">  
-    <div class="dropzone">  
-        <div class="file-icon">📄</div>  
-        <strong>Select a TXT file</strong>  
-        <!-- Yahan accept attribute hata diya hai taaki mobile me koi restriction na aaye -->
-        <input type="file" name="file" id="fileInput" required>  
-    </div>  
-    <button class="primary" id="uploadBtn" type="submit">  
-        Upload File  
-    </button>  
-</form>  
+    <section class="card">  
+        <h2 class="card-title">Upload your file</h2>  
+        <p class="description">  
+            Choose a text file containing your combos to create a processing job.  
+        </p>  
 
+        <form id="uploadForm">  
+            <div class="dropzone">  
+                <div class="file-icon">📄</div>  
+                <strong>Select a TXT file</strong>  
+                <input type="file" name="file" id="fileInput" required>  
+            </div>  
 
-    <button class="secondary" id="startBtn" disabled>  
-        ▶ &nbsp; Start Processing  
-    </button>  
-</section>  
+            <!-- Webhook Integration Option -->
+            <div class="webhook-section">
+                <label>
+                    <input type="checkbox" id="enableWebhook" name="enable_webhook" onclick="toggleWebhookInput()">
+                    Send hits to my Discord Webhook
+                </label>  
 
-<section class="card">  
-    <h2 class="card-title">Job status</h2>  
-    <p class="description">Track the current demo job below.</p>  
+                <div id="webhookContainer" style="display: none;">  
+                    <input type="url" name="user_webhook" id="userWebhookInput" class="webhook-input" placeholder="Paste your Discord Webhook URL here">  
+                </div>  
+            </div>  
 
-    <div class="status-row">  
-        <span class="status-label">Current status</span>  
-        <span class="badge" id="badge">READY</span>  
-    </div>  
+            <button class="primary" id="uploadBtn" type="submit">  
+                Upload File  
+            </button>  
+        </form>  
 
-    <div class="progress-track">  
-        <div class="progress-fill" id="progress"></div>  
-    </div>  
+        <button class="secondary" id="startBtn" disabled>  
+            ▶ &nbsp; Start Processing  
+        </button>  
+    </section>  
 
-    <div id="message" role="status" aria-live="polite">  
-        Upload a file to get started.  
-    </div>  
+    <section class="card">  
+        <h2 class="card-title">Job status</h2>  
+        <p class="description">Track the current job below.</p>  
 
-    <div class="stats">  
-        <div class="stat">  
-            <div class="stat-name">Lines processed</div>  
-            <div class="stat-value" id="lineCount">—</div>  
+        <div class="status-row">  
+            <span class="status-label">Current status</span>  
+            <span class="badge" id="badge">READY</span>  
         </div>  
-        <div class="stat">  
-            <div class="stat-name">Progress</div>  
-            <div class="stat-value" id="percent">0%</div>  
+
+        <div class="progress-track">  
+            <div class="progress-fill" id="progress"></div>  
         </div>  
-    </div>  
-</section>  
 
-<footer>Demon Dashboard · Local demo mode</footer>
+        <div id="message" role="status" aria-live="polite">  
+            Upload a file to get started.  
+        </div>  
 
-</div>  <script>  
+        <div class="stats">  
+            <div class="stat">  
+                <div class="stat-name">Lines processed</div>  
+                <div class="stat-value" id="lineCount">—</div>  
+            </div>  
+            <div class="stat">  
+                <div class="stat-name">Progress</div>  
+                <div class="stat-value" id="percent">0%</div>  
+            </div>  
+        </div>  
+    </section>  
+
+    <footer>Demon Dashboard · Experimental mode</footer>
+</div>  
+
+<script>  
 console.log("Demon Dashboard JS loaded");  
-  
+
+function toggleWebhookInput() {  
+    var checkBox = document.getElementById("enableWebhook");  
+    var webhookContainer = document.getElementById("webhookContainer");  
+    var webhookInput = document.getElementById("userWebhookInput");  
+    
+    if (checkBox.checked) {  
+        webhookContainer.style.display = "block";  
+        webhookInput.required = true;  
+    } else {  
+        webhookContainer.style.display = "none";  
+        webhookInput.required = false;  
+        webhookInput.value = "";  
+    }  
+}  
+
 const form = document.getElementById("uploadForm");  
-  
-form.addEventListener("submit", (event) => {  
-    event.preventDefault();  
-    console.log("Upload form intercepted");  
-});  
 const uploadBtn = document.getElementById("uploadBtn");  
 const startBtn = document.getElementById("startBtn");  
 const badge = document.getElementById("badge");  
@@ -376,8 +451,6 @@ form.addEventListener("submit", async (event) => {
     }  
 });  
   
-  
-  
 startBtn.addEventListener("click", async () => {  
     if (!jobId || busy) return;  
   
@@ -409,17 +482,15 @@ startBtn.addEventListener("click", async () => {
             }  
   
             if (status.status === "Completed") {  
-    setStatus("Completed", 100, status.message);  
-    lineCount.textContent = status.line_count ?? "—";  
+                setStatus("Completed", 100, status.message);  
+                lineCount.textContent = status.line_count ?? "—";  
 
-    // Automatically add a download link for results.txt
-    if (status.download_url) {
-        message.innerHTML += `<br><br><a href="${status.download_url}" class="primary" style="display:inline-block; padding:10px 16px; text-decoration:none; border-radius:8px; background:#4ade80; color:#000; font-weight:bold;">📥 Download results.txt</a>`;
-    }
-    break;  
-}  
+                if (status.download_url) {  
+                    message.innerHTML += `<br><br><a href="${status.download_url}" class="primary" style="display:inline-block; padding:10px 16px; text-decoration:none; border-radius:8px; background:#4ade80; color:#000; font-weight:bold;">📥 Download results.txt</a>`;  
+                }  
+                break;  
+            }  
 
-  
             if (status.status === "Error") {  
                 throw new Error(status.message || "Processing failed");  
             }  
@@ -439,8 +510,6 @@ startBtn.addEventListener("click", async () => {
         startBtn.disabled = false;  
     }  
 });  
-  
-  
-;  
-</script>  </body>  
-</html> 
+</script>  
+</body>  
+</html>  
